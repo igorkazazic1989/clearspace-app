@@ -36,7 +36,7 @@ export default function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (email) {
-      setSubmitted(true);
+      fetch("https://formspree.io/f/xvzbylba", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email }) }).then(() => setSubmitted(true));
     }
   };
 
