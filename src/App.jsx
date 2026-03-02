@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react"; // Lagt till React här
+/* global Paddle */
+import React, { useState, useEffect } from "react";
 import { supabase } from "./supabase";
 
 const fonts = `@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap');`;
@@ -23,7 +24,12 @@ function AuthView() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await supabase.auth.signInWithOtp({ 
+        email,
+        options: {
+          emailRedirectTo: window.location.origin
+        }
+      });
       if (error) alert(error.message);
       else alert("Kolla din mejl för inloggningslänk!");
     } catch (err) {
@@ -58,48 +64,4 @@ function AuthView() {
 }
 
 export default function App() {
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleSubscribe = () => {
-    if (!session) return;
-    if (!window.Paddle) {
-      alert("Betalsystemet laddas, försök igen om ett ögonblick.");
-      return;
-    }
-    window.Paddle.Checkout.open({
-      items: [{ priceId: "pri_01kjfdcenf2ztwdq53mwb2yrsg", quantity: 1 }],
-      customData: { userId: session.user.id }
-    });
-  };
-
-  if (!session) return <AuthView />;
-
-  return (
-    <>
-      <style>{fonts}{css}</style>
-      <header className="hero">
-        <div style={{color: '#6366f1', fontWeight: 'bold', marginBottom: '10px', fontSize: '0.8rem'}}>KONTO: {session.user.email}</div>
-        <h1>ClearSpace AI</h1>
-        <button onClick={handleSubscribe} className="btn" style={{ padding: '20px 40px', fontSize: '1.2rem' }}>
-          Start 7-Day Free Trial
-        </button>
-        <button onClick={() => supabase.auth.signOut()} style={{display: 'block', margin: '20px auto', background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.8rem'}}>Logga ut</button>
-      </header>
-      <footer className="container">
-        <p>© 2026 ClearSpace AI. Mål: 1 500 SEK/mån totalt sparande.</p>
-      </footer>
-    </>
-  );
-}
+  const [session, setSession] = useState
