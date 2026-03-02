@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "./supabase"; // Importera din fungerande klient
+import { supabase } from "./supabase";
 
 const fonts = `@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap');`;
 
@@ -12,9 +12,6 @@ const css = `
   .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); }
   .input-field { background: #16161d; border: 1px solid #2a2a35; padding: 16px; border-radius: 12px; color: white; width: 100%; max-width: 400px; font-family: 'DM Mono'; font-size: 1rem; margin-bottom: 20px; outline: none; }
   .container { max-width: 900px; margin: 0 auto; padding: 80px 20px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
-  .card { background: #16161d; padding: 25px; border-radius: 16px; border: 1px solid #2a2a35; }
-  .legal-section { background: #07070c; padding: 60px 0; border-top: 1px solid #2a2a35; font-size: 0.85rem; }
   footer { text-align: center; padding: 80px 20px; opacity: 0.5; font-size: 0.85rem; }
 `;
 
@@ -36,7 +33,7 @@ function AuthView() {
       <style>{fonts}{css}</style>
       <header className="hero">
         <h1>ClearSpace AI</h1>
-        <p style={{marginBottom: '30px'}}>Logga in med din e-post för att starta din trial.</p>
+        <p style={{marginBottom: '30px'}}>Logga in för att hantera din prenumeration.</p>
         <form onSubmit={handleLogin}>
           <input 
             className="input-field" 
@@ -66,8 +63,11 @@ export default function App() {
   }, []);
 
   const handleSubscribe = () => {
-    if (!session) return;
-    Paddle.Checkout.open({
+    if (!session || !window.Paddle) {
+        alert("Väntar på betalsystemet... Prova igen om en sekund.");
+        return;
+    }
+    window.Paddle.Checkout.open({
       items: [{ priceId: "pri_01kjfdcenf2ztwdq53mwb2yrsg", quantity: 1 }],
       customData: { userId: session.user.id }
     });
@@ -79,25 +79,15 @@ export default function App() {
     <>
       <style>{fonts}{css}</style>
       <header className="hero">
-        <div style={{color: '#6366f1', fontWeight: 'bold', marginBottom: '10px'}}>INLOGGAD SOM: {session.user.email}</div>
+        <div style={{color: '#6366f1', fontWeight: 'bold', marginBottom: '10px'}}>KONTO: {session.user.email}</div>
         <h1>ClearSpace AI</h1>
         <button onClick={handleSubscribe} className="btn" style={{ padding: '20px 40px', fontSize: '1.2rem' }}>
           Start 7-Day Free Trial
         </button>
         <button onClick={() => supabase.auth.signOut()} style={{display: 'block', margin: '20px auto', background: 'none', border: 'none', color: '#888', cursor: 'pointer'}}>Logga ut</button>
       </header>
-
-      <div className="container">
-        <section className="grid">
-            <div className="card"><h3>1. Swipe-to-Clean</h3><p>High-speed productivity.</p></div>
-            <div className="card"><h3>2. Privacy First</h3><p>100% Local LLM.</p></div>
-        </section>
-      </div>
-
-      <footer className="legal-section">
-        <div className="container" style={{textAlign: 'center'}}>
-          <p>© 2026 ClearSpace AI. Sparmål: 1 000 SEK/mån.</p>
-        </div>
+      <footer className="container">
+        <p>© 2026 ClearSpace AI. Sparmål: 1 000 SEK/mån.</p>
       </footer>
     </>
   );
