@@ -30,38 +30,4 @@ function AuthView() {
           emailRedirectTo: window.location.origin
         }
       });
-      if (error) alert(error.message);
-      else alert("Kolla din mejl för inloggningslänk!");
-    } catch (err) {
-      alert("Ett fel uppstod vid inloggning.");
-    }
-    setLoading(false);
-  };
-
-  return (
-    <>
-      <style>{fonts}{css}</style>
-      <header className="hero">
-        <h1>ClearSpace AI</h1>
-        <p style={{marginBottom: '30px', opacity: 0.8}}>Logga in för att starta din prenumeration.</p>
-        <form onSubmit={handleLogin}>
-          <input 
-            className="input-field" 
-            type="email" 
-            placeholder="din.mail@exempel.se" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-          />
-          <br />
-          <button type="submit" className="btn" disabled={loading}>
-            {loading ? "Skickar..." : "Logga in / Skapa konto"}
-          </button>
-        </form>
-      </header>
-    </>
-  );
-}
-
-export default function App() {
-  const [session, setSession] = useState
+      if (error
