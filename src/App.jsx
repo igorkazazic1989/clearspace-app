@@ -26,8 +26,82 @@ function AuthView() {
     try {
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
-        options: {
-          emailRedirectTo: window.location.origin
-        }
+        options: { emailRedirectTo: window.location.origin }
       });
-      if (error
+      if (error) alert(error.message);
+      else alert("Kolla din mejl för inloggningslänk!");
+    } catch (err) {
+      alert("Ett fel uppstod vid inloggning.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <>
+      <style>{fonts}{css}</style>
+      <header className="hero">
+        <h1>ClearSpace AI</h1>
+        <p style={{marginBottom: '30px', opacity: 0.8}}>Logga in för att starta din prenumeration.</p>
+        <form onSubmit={handleLogin}>
+          <input 
+            className="input-field" 
+            type="email" 
+            placeholder="din.mail@exempel.se" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+          />
+          <br />
+          <button type="submit" className="btn" disabled={loading}>
+            {loading ? "Skickar..." : "Logga in / Skapa konto"}
+          </button>
+        </form>
+      </header>
+    </>
+  );
+}
+
+export default function App() {
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSubscribe = () => {
+    if (!session) return;
+    if (typeof window !== "undefined" && window.Paddle) {
+      window.Paddle.Checkout.open({
+        items: [{ priceId: "pri_01kjfdcenf2ztwdq53mwb2yrsg", quantity: 1 }],
+        customData: { userId: session.user.id }
+      });
+    } else {
+      alert("Betalsystemet laddas, försök igen om ett ögonblick.");
+    }
+  };
+
+  if (!session) return <AuthView />;
+
+  return (
+    <>
+      <style>{fonts}{css}</style>
+      <header className="hero">
+        <div style={{color: '#6366f1', fontWeight: 'bold', marginBottom: '10px', fontSize: '0.8rem'}}>KONTO: {session.user.email}</div>
+        <h1>ClearSpace AI</h1>
+        <button onClick={handleSubscribe} className="btn" style={{ padding: '20px 40px', fontSize: '1.2rem' }}>
+          Start 7-Day Free Trial
+        </button>
+        <button onClick={() => supabase.auth.signOut()} style={{display: 'block', margin: '20px auto', background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.8rem'}}>Logga ut</button>
+      </header>
+      <footer className="container">
+        <p>© 2026 ClearSpace AI. Mål: 1 500 SEK/mån totalt sparande.</p>
+      </footer>
+    </>
+  );
+}
