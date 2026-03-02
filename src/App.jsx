@@ -49,24 +49,25 @@ export default function App() {
         <h1>ClearSpace AI</h1>
         <p style={{fontSize: '1.4rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto'}}>Declutter your digital life. One swipe at a time.</p>
         
-        {!submitted ? (
-          <form className="waitlist-form" onSubmit={handleSubmit}>
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
-              className="input-field" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-            />
-            <button type="submit" className="btn">Join Waitlist</button>
-          </form>
-        ) : (
-          <div className="success-msg">
-            🎉 <strong>You're on the list!</strong> We'll notify you as soon as we launch.
-          </div>
-        )}
-        
+       <div style={{ textAlign: 'center', marginTop: '30px' }}>
+  <button 
+    onClick={() => {
+      Paddle.Checkout.open({
+        items: [{
+          priceId: "pri_01kjfdcenf2ztwdq53mwb2yrsg",
+          quantity: 1
+        }]
+      });
+    }} 
+    className="btn"
+    style={{ padding: '20px 40px', fontSize: '1.2rem' }}
+  >
+    Start 7-Day Free Trial
+  </button>
+  <p style={{ fontSize: '12px', color: '#888', marginTop: '10px' }}>
+    99 SEK/month after trial. Cancel anytime. Card required for verification.
+  </p>
+</div>
         <p style={{fontSize: '0.9rem', opacity: 0.6}}>Join 500+ developers waiting for focus.</p>
       </header>
 
